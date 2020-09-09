@@ -47,7 +47,6 @@ spec:
     - name: dummy-port
       port: 80
       protocol: TCP
-      targetPort: 3030
   selector:
     app: dummy-selector
 {{ end }}
