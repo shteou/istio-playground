@@ -1,0 +1,53 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: {{ .Values.externalServiceName }}
+spec:
+  hosts:
+  - {{ .Values.externalServiceName }}
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+  exportTo:
+  - "."
+  resolution: DNS
+  location: MESH_EXTERNAL
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ .Values.serviceName }}
+spec:
+  hosts:
+  - {{ .Values.serviceName }}
+  http:
+  - match:
+    - uri:
+        regex: ".*"
+    rewrite:
+      authority: {{ .Values.externalServiceName }}
+    route:
+    - destination:
+        host: {{ .Values.externalServiceName }} 
+      weight: 100
+    timeout: 30s
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.serviceName }}
+spec:
+{{ if .Values.externalName }}
+  type: ExternalName
+  externalName: {{ .Values.externalServiceName }}
+{{ else }}
+  type: ClusterIP
+  ports:
+    - name: dummy-port
+      port: 80
+      protocol: TCP
+      targetPort: 3030
+  selector:
+    app: dummy-selector
+{{ end }}
