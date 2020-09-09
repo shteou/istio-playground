@@ -27,7 +27,6 @@ spec:
     route:
     - destination:
         host: {{ .Values.externalServiceName }} 
-      weight: 100
     timeout: 30s
 ---
 apiVersion: v1
