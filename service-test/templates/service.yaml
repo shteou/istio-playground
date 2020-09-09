@@ -22,10 +22,7 @@ spec:
   hosts:
   - {{ .Values.serviceName }}
   http:
-  - match:
-    - uri:
-        regex: ".*"
-    rewrite:
+  - rewrite:
       authority: {{ .Values.externalServiceName }}
     route:
     - destination:
